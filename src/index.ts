@@ -1,1 +1,1 @@
-console.log('lab', process.argv.slice(2))
+console.log("lab", process.argv.slice(2));
