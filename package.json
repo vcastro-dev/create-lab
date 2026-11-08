@@ -6,7 +6,7 @@
   "scripts": {
     "test": "tsx --test \"src/**/*.test.ts\"",
     "dev": "tsx src/index.ts",
-    "check": "tsc"
+    "check": "tsc && biome check ./src"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +17,7 @@
     "execa": "^10.2.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.6.6",
     "@types/node": "^26.6.6",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
