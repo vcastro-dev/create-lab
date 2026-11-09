@@ -1,15 +1,19 @@
 import assert from "node:assert/strict";
 import test, { describe } from "node:test";
-import { expectFailure, expectSuccess } from "../../shared/result.test.ts";
-import { UsageErrorCode } from "./errors.ts";
-import { parseArgs } from "./parseArgs.ts";
+import { expectCode } from "../../../shared/test-helpers/expectCode.ts";
+import {
+	expectFailure,
+	expectSuccess,
+} from "../../../shared/test-helpers/result.ts";
+import { UsageErrorCode } from "../errors.ts";
+import { parseArgs } from "../parseArgs.ts";
 
 test("fail when more than 2 args are provided", () => {
 	const extra = ["rest"];
 	const result = parseArgs(["http", "test", ...extra]);
 
 	expectFailure(result);
-	assert.equal(result.error.code, UsageErrorCode.TooManyArgs);
+	expectCode(result.error, UsageErrorCode.TooManyArgs);
 
 	if (result.error.code === UsageErrorCode.TooManyArgs) {
 		assert.deepEqual(result.error.extra, [...extra]);
@@ -20,21 +24,21 @@ test("fail when kind is missing", () => {
 	const result = parseArgs([]);
 
 	expectFailure(result);
-	assert.equal(result.error.code, UsageErrorCode.MissingKind);
+	expectCode(result.error, UsageErrorCode.MissingKind);
 });
 
 test("fail when name is missing", () => {
 	const result = parseArgs(["http"]);
 
 	expectFailure(result);
-	assert.equal(result.error.code, UsageErrorCode.MissingName);
+	expectCode(result.error, UsageErrorCode.MissingName);
 });
 
 test("fail when kind is invalid", () => {
 	const result = parseArgs(["test", "lab"]);
 
 	expectFailure(result);
-	assert.equal(result.error.code, UsageErrorCode.UnsupportedKind);
+	expectCode(result.error, UsageErrorCode.UnsupportedKind);
 });
 
 describe("fail when name is invalid", () => {
@@ -58,7 +62,7 @@ describe("fail when name is invalid", () => {
 				);
 			}
 
-			assert.equal(result.error.code, UsageErrorCode.InvalidName);
+			expectCode(result.error, UsageErrorCode.InvalidName);
 			assert.equal(result.error.received, name);
 		});
 	}

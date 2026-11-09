@@ -1,4 +1,4 @@
-import { err, ok, type Result } from "../../shared/result.ts";
+import { err, ok, type Result, type Success } from "../../shared/result.ts";
 import { type UsageError, UsageErrorCode } from "./errors.ts";
 import type { Kind } from "./types.ts";
 import { isValidKind, isValidName } from "./validators.ts";

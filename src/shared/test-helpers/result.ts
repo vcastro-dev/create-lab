@@ -1,5 +1,5 @@
 import { fail } from "node:assert/strict";
-import type { Failure, Result, Success } from "./result.ts";
+import type { Failure, Result, Success } from "../result.ts";
 
 export function expectFailure<T, E>(
 	result: Result<T, E>,
