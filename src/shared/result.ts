@@ -1,9 +1,9 @@
-type Success<T> = {
+export type Success<T> = {
 	ok: true;
 	value: T;
 };
 
-type Failure<E> = {
+export type Failure<E> = {
 	ok: false;
 	error: E;
 };

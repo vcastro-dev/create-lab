@@ -3,14 +3,17 @@ export const UsageErrorCode = {
 	MissingName: "MISSING_NAME",
 	UnsupportedKind: "UNSUPPORTED_KIND",
 	TooManyArgs: "TOO_MANY_ARGS",
+	InvalidName: "INVALID_NAME",
 } as const;
 
 export type MissingKindError = {
 	code: typeof UsageErrorCode.MissingKind;
+	message: string;
 };
 
 export type MissingNameError = {
 	code: typeof UsageErrorCode.MissingName;
+	message: string;
 };
 
 export type UnsupportedKindError = {
@@ -25,8 +28,15 @@ export type TooManyArgsError = {
 	extra: string[];
 };
 
+export type InvalidNameError = {
+	code: typeof UsageErrorCode.InvalidName;
+	message: string;
+	received: string;
+};
+
 export type UsageError =
 	| MissingKindError
 	| MissingNameError
 	| UnsupportedKindError
-	| TooManyArgsError;
+	| TooManyArgsError
+	| InvalidNameError;

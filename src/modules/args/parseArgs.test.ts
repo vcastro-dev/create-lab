@@ -1,16 +1,14 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import test, { describe } from "node:test";
+import { expectFailure, expectSuccess } from "../../shared/result.test.ts";
 import { UsageErrorCode } from "./errors.ts";
 import { parseArgs } from "./parseArgs.ts";
 
-test("throws an error when more than 2 args are provided", () => {
+test("fail when more than 2 args are provided", () => {
 	const extra = ["rest"];
 	const result = parseArgs(["http", "test", ...extra]);
 
-	if (result.ok) {
-		assert.fail("expected failure");
-	}
-
+	expectFailure(result);
 	assert.equal(result.error.code, UsageErrorCode.TooManyArgs);
 
 	if (result.error.code === UsageErrorCode.TooManyArgs) {
@@ -18,39 +16,78 @@ test("throws an error when more than 2 args are provided", () => {
 	}
 });
 
-test("throws an error when kind is missing", () => {
+test("fail when kind is missing", () => {
 	const result = parseArgs([]);
 
-	if (result.ok) {
-		assert.fail("expected failure");
-	}
+	expectFailure(result);
 	assert.equal(result.error.code, UsageErrorCode.MissingKind);
 });
 
-test("throws an error when name is missing", () => {
+test("fail when name is missing", () => {
 	const result = parseArgs(["http"]);
 
-	if (result.ok) {
-		assert.fail("expected failure");
-	}
+	expectFailure(result);
 	assert.equal(result.error.code, UsageErrorCode.MissingName);
 });
 
-test("throws an error when kind is invalid", () => {
+test("fail when kind is invalid", () => {
 	const result = parseArgs(["test", "lab"]);
 
-	if (result.ok) {
-		assert.fail("expected failure");
-	}
+	expectFailure(result);
 	assert.equal(result.error.code, UsageErrorCode.UnsupportedKind);
 });
 
-test("accepts valid kind and name", () => {
-	const result = parseArgs(["http", "test"]);
+describe("fail when name is invalid", () => {
+	const testCases = [
+		{ title: "contains uppercase letter", name: "Test" },
+		{ title: "contains blank space", name: "test test" },
+		{ title: "starts with dot", name: ".test" },
+		{ title: "starts with hyphen", name: "-test" },
+		{ title: "starts with backslash", name: "\\test" },
+		{ title: "contains a path separator", name: "test/test" },
+		{ title: "is longer than 100 characters", name: "a".repeat(101) },
+	];
 
-	if (!result.ok) {
-		assert.fail("expected success");
+	for (const { title, name } of testCases) {
+		test(title, () => {
+			const result = parseArgs(["http", name]);
+
+			if (result.ok) {
+				assert.fail(
+					`\nexpected: failure \nreceived: ${JSON.stringify(result.value, null, 2)}`,
+				);
+			}
+
+			assert.equal(result.error.code, UsageErrorCode.InvalidName);
+			assert.equal(result.error.received, name);
+		});
 	}
+});
 
-	assert.deepEqual(result.value, { kind: "http", name: "test" });
+describe("accepts valid kind and name", () => {
+	const testCases = [
+		{
+			args: ["http", "test"],
+			expected: { kind: "http", name: "test" },
+		},
+		{
+			args: ["http", "test-1"],
+			expected: { kind: "http", name: "test-1" },
+		},
+		{
+			args: ["http", "t"],
+			expected: { kind: "http", name: "t" },
+		},
+	];
+
+	for (const { args, expected } of testCases) {
+		const [kind, name] = args;
+
+		test(`name "${name}" and kind "${kind}"`, () => {
+			const result = parseArgs(args);
+
+			expectSuccess(result);
+			assert.deepEqual(result.value, expected);
+		});
+	}
 });

@@ -1,11 +1,7 @@
-import { createUnionValidator } from "../../shared/createUnionValidator.ts";
 import { err, ok, type Result } from "../../shared/result.ts";
 import { type UsageError, UsageErrorCode } from "./errors.ts";
-
-const supportedKind = ["http"] as const;
-export type Kind = (typeof supportedKind)[number];
-
-const isValidKind = createUnionValidator(supportedKind);
+import type { Kind } from "./types.ts";
+import { isValidKind, isValidName } from "./validators.ts";
 
 type ParseArgsResult = Result<
 	{
@@ -47,6 +43,14 @@ export const parseArgs = ([
 			code: UsageErrorCode.UnsupportedKind,
 			message: "unsupported kind",
 			received: kind,
+		});
+	}
+
+	if (!isValidName(name)) {
+		return err({
+			code: UsageErrorCode.InvalidName,
+			message: "invalid name",
+			received: name,
 		});
 	}
 
